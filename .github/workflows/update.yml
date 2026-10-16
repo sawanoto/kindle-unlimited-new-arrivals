@@ -1,0 +1,93 @@
+name: Update Kindle Unlimited and deploy
+
+on:
+  schedule:
+    # UTC 19:07 = 翌日 JST 04:07。スケジュールは遅延する場合があります。
+    - cron: '7 19 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'outputs/**'
+      - '.github/workflows/update.yml'
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: ku-update-and-pages
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    outputs:
+      site_ready: ${{ steps.build.outcome == 'success' }}
+    defaults:
+      run:
+        working-directory: outputs
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: outputs/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - name: Fetch source (keep last successful data on failure)
+        id: crawl
+        continue-on-error: true
+        env:
+          MAX_PAGES: '120'
+          REQUEST_DELAY_MS: '2000'
+        run: npm run update
+      - name: Save last result and attempt status
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/latest.json data/status.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Update KU data and fetch status [skip ci]'
+            git pull --rebase origin main
+            git push
+          fi
+      - name: Build site with last successful data
+        id: build
+        run: npm run build
+      - name: Save website artifact for authenticated download
+        uses: actions/upload-artifact@v4
+        with:
+          name: ku-static-site
+          path: dist
+          retention-days: 7
+      - name: Upload static website
+        if: vars.PAGES_ENABLED == 'true'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - name: Report fetch status
+        if: always()
+        env:
+          FETCH_OUTCOME: ${{ steps.crawl.outcome }}
+        run: |
+          node -e "const fs=require('fs'); for(const name of ['latest','status']) { try { const d=JSON.parse(fs.readFileSync('data/'+name+'.json')); delete d.books; console.log(name, JSON.stringify(d)); fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, '\n### '+name+'\n\n'+JSON.stringify(d,null,2)+'\n'); } catch {} }"
+      - name: Fail run when fetching failed
+        if: steps.crawl.outcome == 'failure'
+        run: exit 1
+
+  deploy:
+    needs: update
+    if: ${{ always() && !cancelled() && needs.update.outputs.site_ready == 'true' && vars.PAGES_ENABLED == 'true' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      # 取得失敗時も、作成できた「前回の正常データ＋今回のエラー表示」を配信。
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

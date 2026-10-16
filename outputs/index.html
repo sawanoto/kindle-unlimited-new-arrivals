@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#132b32"><meta name="robots" content="noindex,nofollow">
+  <title>KU新着・一般書を探す</title><link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<header><div class="wrap top"><div><div class="eyebrow">KINDLE UNLIMITED · 新着</div><h1>一般書を探す</h1><p>きんとくの追加確認日をもとに、24時間前を含む日付から取得</p><p id="last-update">読み込み中</p></div><button id="refresh" class="primary">データを更新</button></div></header>
+<main class="wrap">
+  <div id="notice" role="status"></div>
+  <p id="cloud-note" hidden>毎朝4時頃に自動取得します。ボタンは保存済みの最新結果を読み込みます。<a id="actions-link" hidden target="_blank" rel="noopener">GitHubで取得を手動実行</a>（所有者のみ）</p>
+  <div class="toolbar"><div class="tabs" role="tablist" aria-label="表示対象"><button data-view="candidates" class="active">一般書候補</button><button data-view="all">すべて</button><button data-view="excluded">除外された本</button></div><label class="toggle"><input id="covers" type="checkbox" checked>表紙を表示</label><label class="toggle"><input id="novel" type="checkbox" checked>小説を含む</label><label class="toggle"><input id="checked" type="checkbox">確認済みを表示</label></div>
+  <div class="summary"><strong id="count">—</strong><span id="period">読み込み中</span><span id="manual-count">確認待ちの手動除外：—</span></div>
+  <div id="books" class="books"></div>
+  <details class="debug"><summary>既読・除外の引き継ぎ</summary>
+    <p>設定はこのブラウザーに保存します。ローカル版で「設定を書き出す」を押し、クラウド版で取り込むと既読・手動除外・復元状態を引き継げます。取り込みは既存の設定へ追加します。</p>
+    <div class="actions"><button id="export-state">設定を書き出す</button><label>設定を取り込む <input id="import-state" type="file" accept="application/json,.json"></label><button id="export-feedback">手動除外の記録を書き出す</button></div>
+    <p>クラウド版で追加した除外を自動ルールにしたいときは、手動除外の記録を書き出し、このチャットに添付してください。自動除外の誤判定は「除外された本」から「候補に戻す」で復元できます。</p>
+  </details>
+  <details class="debug rules"><summary>自動除外ルール</summary><div id="rules"><p>読み込み中</p></div><p>追加済みの指定ルールを維持しています。普通の小説・一般書・判断不能の本は候補として残します。</p></details>
+  <details class="debug"><summary>取得情報</summary><dl id="stats"></dl><p>日付範囲には24時間前より古い作品も含まれます。作品の「更新時刻」はKUへの追加日時と同一とは限らないため、範囲の判定には使いません。</p></details>
+  <footer>出典：<a href="https://premium.gamepedia.jp/kindle/unlimited?sort=unlimited_start_at" target="_blank" rel="noopener">きんとく「Kindle Unlimitedで読める新着一覧」</a><br>書誌情報・表紙の権利は各権利者に帰属します。KU対象かどうかはAmazonでご確認ください。</footer>
+</main>
+<script src="./runtime-config.js"></script><script type="module" src="./app.js"></script>
+</body></html>

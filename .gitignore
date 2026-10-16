@@ -1,0 +1,10 @@
+outputs/node_modules/
+outputs/data/cache.json
+outputs/data/manual-exclusions.json
+outputs/data/*.tmp
+dist/
+work/
+backups/
+*.lnk
+*.log
+.env*
