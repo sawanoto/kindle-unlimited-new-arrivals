@@ -1,7 +1,7 @@
 {
-  "ok": false,
-  "attemptedAt": "2026-10-16T20:00:14.505Z",
-  "finishedAt": "2026-10-16T20:00:14.759Z",
-  "pages": 0,
-  "error": "取得元が HTTP 403 を返しました"
+  "ok": true,
+  "attemptedAt": "2026-10-16T20:22:11.391Z",
+  "finishedAt": "2026-10-16T20:22:18.220Z",
+  "pages": 4,
+  "error": null
 }
