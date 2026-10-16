@@ -2,8 +2,8 @@ name: Update Kindle Unlimited and deploy
 
 on:
   schedule:
-    # UTC 19:07 = 翌日 JST 04:07。スケジュールは遅延する場合があります。
-    - cron: '7 19 * * *'
+    # UTC 18:00 = 翌日 JST 03:00。スケジュールは遅延する場合があります。
+    - cron: '0 18 * * *'
   workflow_dispatch:
   push:
     branches: [main]
