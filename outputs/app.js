@@ -170,7 +170,10 @@ $('#refresh').onclick = async () => {
 if (config.static) {
   $('#cloud-note').hidden = false;
   const link = $('#actions-link');
-  if (config.fetchEnabled === false) {
+  if (config.updateMode === 'pc-login') {
+    link.textContent = 'GitHubで公開状況を確認';
+    $('#cloud-note').replaceChildren(text('span', 'PCへのサインイン時に新着を取得し、公開します（1日1回）。公開済みの一覧はPCを切っても閲覧できます。 '), link);
+  } else if (config.fetchEnabled === false) {
     link.textContent = 'GitHubで更新状況を確認';
     $('#cloud-note').replaceChildren(text('span', '取得元がクラウドからのアクセスを拒否（HTTP 403）したため、自動取得を停止しています。前回の正常取得データを表示します。 '), link);
   }

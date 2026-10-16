@@ -62,6 +62,7 @@ jobs:
         id: build
         env:
           FETCH_ENABLED: ${{ vars.FETCH_ENABLED }}
+          UPDATE_MODE: ${{ vars.UPDATE_MODE }}
         run: npm run build
       - name: Save website artifact for authenticated download
         uses: actions/upload-artifact@v4
