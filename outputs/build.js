@@ -27,7 +27,7 @@ catch (error) { if (error.code !== 'ENOENT') throw error; }
 await writeFile(path.join(dest, 'data/manual-exclusion-ids.json'), JSON.stringify([...manualIds]));
 const repo = process.env.GITHUB_REPOSITORY || '';
 const actionsUrl = /^[\w.-]+\/[\w.-]+$/.test(repo) ? `https://github.com/${repo}/actions/workflows/update.yml` : '';
-await writeFile(path.join(dest, 'runtime-config.js'), `window.KU_CONFIG = ${JSON.stringify({ static: true, books: './data/latest.json', rules: './data/rules.json', status: './data/status.json', seed: './data/manual-exclusion-ids.json', actionsUrl })};\n`);
+await writeFile(path.join(dest, 'runtime-config.js'), `window.KU_CONFIG = ${JSON.stringify({ static: true, fetchEnabled: process.env.FETCH_ENABLED !== 'false', books: './data/latest.json', rules: './data/rules.json', status: './data/status.json', seed: './data/manual-exclusion-ids.json', actionsUrl })};\n`);
 await writeFile(path.join(dest, '.nojekyll'), '');
 await writeFile(path.join(dest, 'robots.txt'), 'User-agent: *\nDisallow: /\n');
 console.log(`静的サイト: ${dest} / ${data.books.length}冊 / 個人の除外履歴・既読状態・HTMLキャッシュは含みません`);

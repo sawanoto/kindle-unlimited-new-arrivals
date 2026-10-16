@@ -169,6 +169,11 @@ $('#refresh').onclick = async () => {
 };
 if (config.static) {
   $('#cloud-note').hidden = false;
-  if (config.actionsUrl) { $('#actions-link').href = config.actionsUrl; $('#actions-link').hidden = false; }
+  const link = $('#actions-link');
+  if (config.fetchEnabled === false) {
+    link.textContent = 'GitHubで更新状況を確認';
+    $('#cloud-note').replaceChildren(text('span', '取得元がクラウドからのアクセスを拒否（HTTP 403）したため、自動取得を停止しています。前回の正常取得データを表示します。 '), link);
+  }
+  if (config.actionsUrl) { link.href = config.actionsUrl; link.hidden = false; }
 }
 loadData(); loadRules();

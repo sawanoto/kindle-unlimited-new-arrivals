@@ -31,6 +31,8 @@ jobs:
         working-directory: outputs
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -40,6 +42,7 @@ jobs:
       - run: npm test
       - name: Fetch source (keep last successful data on failure)
         id: crawl
+        if: vars.FETCH_ENABLED != 'false'
         continue-on-error: true
         env:
           MAX_PAGES: '120'
@@ -52,11 +55,13 @@ jobs:
           git add data/latest.json data/status.json
           if ! git diff --cached --quiet; then
             git commit -m 'Update KU data and fetch status [skip ci]'
-            git pull --rebase origin main
+            git pull --rebase -X theirs origin main
             git push
           fi
       - name: Build site with last successful data
         id: build
+        env:
+          FETCH_ENABLED: ${{ vars.FETCH_ENABLED }}
         run: npm run build
       - name: Save website artifact for authenticated download
         uses: actions/upload-artifact@v4
@@ -73,7 +78,9 @@ jobs:
         if: always()
         env:
           FETCH_OUTCOME: ${{ steps.crawl.outcome }}
+          FETCH_ENABLED: ${{ vars.FETCH_ENABLED }}
         run: |
+          echo "Fetch enabled: $FETCH_ENABLED; outcome: $FETCH_OUTCOME" >> "$GITHUB_STEP_SUMMARY"
           node -e "const fs=require('fs'); for(const name of ['latest','status']) { try { const d=JSON.parse(fs.readFileSync('data/'+name+'.json')); delete d.books; console.log(name, JSON.stringify(d)); fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, '\n### '+name+'\n\n'+JSON.stringify(d,null,2)+'\n'); } catch {} }"
       - name: Fail run when fetching failed
         if: steps.crawl.outcome == 'failure'

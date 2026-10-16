@@ -10,4 +10,8 @@
 - 元の個人除外記録：`outputs/data/manual-exclusions.json`（Git対象外、ローカルに維持）
 - 変更前のデータ：`backups/before-cloud/`（Git対象外）
 
-初期状態では `PAGES_ENABLED` が未設定のため一般公開しません。GitHub側で公開方法を設定して初めて、自宅PCを起動しなくても閲覧できるようになります。
+公開先：[一般書を探す](https://sawanoto.github.io/kindle-unlimited-new-arrivals/)
+
+**現在の制約：2026年10月17日のGitHub Actions実行では取得元がHTTP 403を返しました。アクセス制限を回避せず、`FETCH_ENABLED=false` でクラウド取得を停止しています。公開サイトでは前回の正常データを閲覧できますが、毎朝の最新データ取得という完成条件は未達です。取得元からの許可や正式に利用できる取得手段の確認が必要です。**
+
+GitHub側の `PAGES_ENABLED=true` でPagesを有効にしています。取得停止中も、画面更新と最後の正常データの配信はできます。
