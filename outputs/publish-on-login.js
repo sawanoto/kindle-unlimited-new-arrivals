@@ -10,8 +10,9 @@ const logFile = path.join(logs, 'latest.log'), markerFile = path.join(logs, 'las
 const day = () => new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Tokyo' }).format(new Date());
 const log = message => fs.appendFileSync(logFile, `${new Date().toISOString()} ${message}\n`);
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
-const command = (name, args, cwd = root) => {
-  const result = spawnSync(name, args, { cwd, encoding: 'utf8', windowsHide: true, timeout: 15 * 60 * 1000 });
+const command = (name, args, cwd = root, timeout = 60000) => {
+  const result = spawnSync(name, args, { cwd, encoding: 'utf8', windowsHide: true, timeout,
+    env: { ...process.env, GIT_TERMINAL_PROMPT: '0', GCM_INTERACTIVE: 'never' } });
   if (result.stdout) log(result.stdout.trim());
   if (result.status !== 0) throw new Error(`${name} failed: ${result.error?.message || result.stderr || result.status}`);
   return result.stdout.trim();
@@ -49,7 +50,7 @@ try {
       if (changes.length) throw new Error('Remote updates and local data changes both exist; ask Codex to synchronize.');
       command('git', ['merge', '--ff-only', 'origin/main']);
     }
-    command(process.execPath, ['crawler.js'], app);
+    command(process.execPath, ['crawler.js'], app, 15 * 60 * 1000);
     const records = JSON.parse(fs.readFileSync(path.join(app, 'data/manual-exclusions.json'), 'utf8'));
     const seedFile = path.join(app, 'data/manual-exclusion-ids.json');
     const ids = new Set([...JSON.parse(fs.readFileSync(seedFile, 'utf8')), ...records.map(book => book.id)]);
